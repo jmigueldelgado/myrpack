@@ -632,7 +632,7 @@ loadPmmsfeqm <- function(memberi,yeari)
     X <- X[,-1:-3]
     
     X <- X[,order(colnames(X))]
-    Vec <- as.data.frame(as.vector(t(X)))
+    Vec <- as.data.frame(as.numeric(t(X)))
     colnames(Vec) <- "values"
                                         #        mtrx <- cbind(mtrx,Vec)
     
