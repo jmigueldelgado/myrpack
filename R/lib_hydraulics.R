@@ -138,3 +138,45 @@ V_muskingum <- function(Qin,Qe,V,parm.df)
     Vpresent <- (Qin-Qout)*parm.df$dt[1]+V
     return(Vpresent)
 }
+
+#' Stored volume in retention structure
+#' @param Qin is a SpatialPointsDataFrame inflow to structure in step i
+#' @param Qout is a SpatialPointsDataFrame regulated outflow from structure in step i
+#' @param Qoverflow is a SpatialPointsDataFrame unregulated overflow from structure in step i
+#' @param Vvirtual is the virtual volume in step i, including overflow volume
+#' @param Vprevious is the volume in step i-1
+#' @param param.df is a SpatialPointsDataFrame of parameters of each subbasin, including df (time step), Vmax (maximum allowable volume of structure) and Qoutmax (maximum regulated allowable outflow from structure)
+#' @export
+V_retention <- function(Qin,Qout,Qoverflow,Vprevious,parm.df)
+{
+    Vvirtual <- (Qin-parm.df@data$Qoutmax)*parm.df@data$dt + Vprevious
+    return(Vvirtual)
+}
+
+
+#' define objects
+#' @param Qsb
+#' @export
+define_obj_Qsb<- function(spObj)
+{
+    Qsb <- SpatialPointsDataFrame(coords=spObj@coords,data.frame(Qin=NA,Qout=NA,V=NA),proj4string=spObj@proj4string)
+    return(Qsb)
+}
+
+#' define objects
+#' @param Qpipe
+#' @export
+define_obj_Qpipe<- function(spObj)
+{
+    Qpipe <- SpatialPointsDataFrame(coords=spObj@coords,data.frame(Qin=NA,Qout=NA,V=NA),proj4string=spObj@proj4string)
+    return(Qpipe)
+}
+
+#' define objects
+#' @param Qret_str
+#' @export
+define_obj_Qret_str<- function(spObj)
+{
+    Qret_str <- SpatialPointsDataFrame(coords=spObj@coords,data.frame(Qin=NA,Qout=NA,V=NA),proj4string=spObj@proj4string)
+    return(Qret_str)
+}
