@@ -9,7 +9,7 @@ startGRASS <- function(loc,ms,version)
                MEKONG={
                    gis.Base6 <- "/usr/local/grass-6.4.4svn"
                    gis.Base7 <- "/usr/lib/grass70/"
-                   gisDB <- "/home/delgado/SESAM/sesam_share/grassdata"
+                   gisDB <- "/home/delgado/grassdata"
                },
                mondego={
                    gis.Base6 <-  "/home/delgado/local/grass-6.4.6svn/"
@@ -24,7 +24,7 @@ startGRASS <- function(loc,ms,version)
                {
                    gis.Base6 <- "/usr/lib/grass64"
                    gis.Base7 <-  "/usr/lib/grass70/"
-                   gisDB <- "/home/delgado/SESAM/sesam_share/grassdata"
+                   gisDB <- "/home/delgado/grassdata"
                }
                )
         
