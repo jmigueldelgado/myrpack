@@ -347,7 +347,7 @@ loadTmmsfxds <- function(memberi,yeari)
 #' @export
 loadPmmsfxds <- function(memberi,yeari)
 {
-    address <- paste0("/home/delgado/SESAM/sesam_data/DFG_Erkenntnis_Transfer/Climate_Prediction/mmsf/",yeari,"/small/",memberi,"/P.",yeari,"-01-01.csv")
+    address <- paste0("/home/delgado/SESAM/sesam_data/DFG_Erkenntnis_Transfer/Climate_Prediction/xds/xds.ecmwf/mmsf.LR.bc/",yeari,"/pdd/",memberi,"/P.",yeari,"-01-01.csv")
     X <- read.table(address,sep=",",header=TRUE,check.names=FALSE,fill=TRUE,na.strings="-9999")
     
     addressmeta <- "/home/delgado/SESAM/sesam_data/DFG_Erkenntnis_Transfer/Climate_Prediction/xds/Ceara/StationData/"
@@ -632,7 +632,7 @@ loadPmmsfeqm <- function(memberi,yeari)
     X <- X[,-1:-3]
     
     X <- X[,order(colnames(X))]
-    Vec <- as.data.frame(as.vector(t(X)))
+    Vec <- as.data.frame(as.numeric(t(X)))
     colnames(Vec) <- "values"
                                         #        mtrx <- cbind(mtrx,Vec)
     
