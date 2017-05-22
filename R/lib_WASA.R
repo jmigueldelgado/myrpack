@@ -636,7 +636,8 @@ spacetime2WASA_P <- function(stObj,address)
     cat(HEADER, file = fileConn, sep = "\t")
     cat("\n",file = fileConn, sep = "")
     write.table(dfObj,file = fileConn, quote = FALSE, sep = "\t", row.names = FALSE, col.names=FALSE, fileEncoding = "UTF-8")
-    close(fileConn)            
+    close(fileConn)
+    return(address)
 }
 
 
