@@ -13,7 +13,7 @@ spacetime2WASA_P <- function(stObj,address)
     if("ID" %in% colnames(df)) colnames(df)[colnames(df)=="ID"] <- "id"
     
     df$id <- as.factor(df$id)
-    mtx <- dcast(df[c("time","cat","value")],time ~ id)
+    mtx <- dcast(df[c("time","id","value")],time ~ id)
     mtx <- mtx[,colnames(mtx)!=c("time")]
     thetime$posix <- time(stObj@time)
     try(system(paste0("mkdir ",address)))
