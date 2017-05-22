@@ -1,4 +1,42 @@
 
+#' writes WASA input file
+#' @param stObj is a spacetime object whose points are the centroids of the subbasins
+#' @param address is the path where the file should be written
+#' @export
+spacetime2WASA_P <- function(stObj,address)
+{
+    thetime <- list()
+    
+    df <- as(stObj,"data.frame")
+
+    if("cat" %in% colnames(df)) colnames(df)[colnames(df)=="cat"] <- "id"
+    if("ID" %in% colnames(df)) colnames(df)[colnames(df)=="ID"] <- "id"
+    
+    df$id <- as.factor(df$id)
+    mtx <- dcast(df[c("time","cat","value")],time ~ id)
+    mtx <- mtx[,colnames(mtx)!=c("time")]
+    thetime$posix <- time(stObj@time)
+    try(system(paste0("mkdir ",address)))
+    try(system(paste0("rm ",address,"/rain_daily.dat")))
+    fileConn <- file(paste0(address,"/rain_daily.dat"),"a")
+    cat("Daily total precipitation [mm] for each subasin, ordered according to Map-IDs","Date\t\tSubbasin-ID.", file = fileConn, sep = "\n")
+
+    thetime$str <- strftime(thetime$posix,"%d%m%Y")
+    thetime$index <- seq(1,length(thetime$str),1)
+    dfObj1 <- data.frame(thetime$str,thetime$index)
+    colnames(dfObj1) <- c("0","0")
+    dfObj2 <- mtx
+
+#    colnames(dfObj2) <- as.numeric(stObj@sp@data$ids)
+    dfObj <- data.frame(dfObj1,format(dfObj2,digits=0,nsmall=1, scientific=FALSE))
+    HEADER <- c(colnames(dfObj1),colnames(dfObj2))
+    cat(HEADER, file = fileConn, sep = "\t")
+    cat("\n",file = fileConn, sep = "")
+    write.table(dfObj,file = fileConn, quote = FALSE, sep = "\t", row.names = FALSE, col.names=FALSE, fileEncoding = "UTF-8")
+    close(fileConn)
+    return(address)
+}
+
 ######################333 define locals!!!!!
 
 
@@ -600,44 +638,6 @@ spacetime2WASA_H <- function(stObj,address)
     cat("\n",file = fileConn, sep = "")
     write.table(dfObj,file = fileConn, quote = FALSE, sep = "\t", row.names = FALSE, col.names=FALSE, fileEncoding = "UTF-8")
     close(fileConn)            
-}
-
-#' writes WASA input file
-#' @param stObj is a spacetime object whose points are the centroids of the subbasins
-#' @param address is the path where the file should be written
-#' @export
-spacetime2WASA_P <- function(stObj,address)
-{
-    thetime <- list()
-    
-    df <- as(stObj,"data.frame")
-
-    if("cat" %in% colnames(df)) colnames(df)[colnames(df)=="cat"] <- "id"
-    if("ID" %in% colnames(df)) colnames(df)[colnames(df)=="ID"] <- "id"
-    
-    df$id <- as.factor(df$id)
-    mtx <- dcast(df[c("time","cat","value")],time ~ id)
-    mtx <- mtx[,colnames(mtx)!=c("time")]
-    thetime$posix <- time(stObj@time)
-    try(system(paste0("mkdir ",address)))
-    try(system(paste0("rm ",address,"/rain_daily.dat")))
-    fileConn <- file(paste0(address,"/rain_daily.dat"),"a")
-    cat("Daily total precipitation [mm] for each subasin, ordered according to Map-IDs","Date\t\tSubbasin-ID.", file = fileConn, sep = "\n")
-
-    thetime$str <- strftime(thetime$posix,"%d%m%Y")
-    thetime$index <- seq(1,length(thetime$str),1)
-    dfObj1 <- data.frame(thetime$str,thetime$index)
-    colnames(dfObj1) <- c("0","0")
-    dfObj2 <- mtx
-
-#    colnames(dfObj2) <- as.numeric(stObj@sp@data$ids)
-    dfObj <- data.frame(dfObj1,format(dfObj2,digits=0,nsmall=1, scientific=FALSE))
-    HEADER <- c(colnames(dfObj1),colnames(dfObj2))
-    cat(HEADER, file = fileConn, sep = "\t")
-    cat("\n",file = fileConn, sep = "")
-    write.table(dfObj,file = fileConn, quote = FALSE, sep = "\t", row.names = FALSE, col.names=FALSE, fileEncoding = "UTF-8")
-    close(fileConn)
-    return(address)
 }
 
 
