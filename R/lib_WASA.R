@@ -602,13 +602,22 @@ spacetime2WASA_H <- function(stObj,address)
     close(fileConn)            
 }
 
-
+#' writes WASA input file
+#' @param stObj is a spacetime object whose points are the centroids of the subbasins
+#' @param address is the path where the file should be written
+#' @export
 spacetime2WASA_P <- function(stObj,address)
 {
     thetime <- list()
-
+    
     df <- as(stObj,"data.frame")
-    mtx <- t(matrix(df$values,ncol=length(stObj@time),nrow=length(stObj@sp@data$ids)))
+
+    if("cat" %in% colnames(df)) colnames(df)[colnames(df)=="cat"] <- "id"
+    if("ID" %in% colnames(df)) colnames(df)[colnames(df)=="ID"] <- "id"
+    
+    df$id <- as.factor(df$id)
+    mtx <- dcast(df[c("time","cat","value")],time ~ id)
+    mtx <- mtx[,colnames(mtx)!=c("time")]
     thetime$posix <- time(stObj@time)
     try(system(paste0("mkdir ",address)))
     try(system(paste0("rm ",address,"/rain_daily.dat")))
@@ -619,9 +628,9 @@ spacetime2WASA_P <- function(stObj,address)
     thetime$index <- seq(1,length(thetime$str),1)
     dfObj1 <- data.frame(thetime$str,thetime$index)
     colnames(dfObj1) <- c("0","0")
-    dfObj2 <- as.data.frame(mtx)
+    dfObj2 <- mtx
 
-    colnames(dfObj2) <- as.numeric(stObj@sp@data$ids)
+#    colnames(dfObj2) <- as.numeric(stObj@sp@data$ids)
     dfObj <- data.frame(dfObj1,format(dfObj2,digits=0,nsmall=1, scientific=FALSE))
     HEADER <- c(colnames(dfObj1),colnames(dfObj2))
     cat(HEADER, file = fileConn, sep = "\t")
