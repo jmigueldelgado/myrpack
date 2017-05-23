@@ -90,39 +90,35 @@ IDF <- function(D,T)
 }
 
 #' @param parm.df is SpatialPointsDataFrame pointing to the centroids of the catchment and containing C factor, n, initial loss, permanent loss, dt in s and the id of the upstream subbasin
-#' @param I is the rainfall intensity in mm/h
+#' @param I is the rainfall intensity in mm/h for time step i
+#' @return he is the effective runoff for time step in i
 #' @export
 loss_model <- function(I,parm.df)
 {
     x <- parm.df
-    x@data$he <- ((I*parm.df@data$dt/3600)-parm.df@data$hi)*parm.df@data$c.factor
-    x@data$he[x@data$he<0] <- 0
-    
-    return(x)
+    he@data <- ((I*parm.df@data$dt/3600)-parm.df@data$hi)*parm.df@data$c.factor
+    he[he<0] <- 0
+    return(he)
 }
 
 
-#' @param parm.df is SpatialPointsDataFrame pointing to the centroids of the catchment and containing C factor, n, initial loss, permanent loss and the id of the upstream subbasin
-#' @export
-Qin <- function(P,parm.df)
-{
-
-    
-}
-
-#' Q effluent from the documentation of citydrain 2
+#' Muskingum's effluent in pipe or catchment reach as in the documentation of citydrain 2
 #' @param Qin is a SpatialPointsDataFrame inflows to reach in step i
 #' @param V is a SpatialPointsDataFrame of volumes in reach in step i-1
 #' @param Qout is a SpatialPointsDataFrame of outflows from reach in step i
 #' @param parm.df is SpatialPointsDataFrame pointing to the centroids of the catchment and containing dt, K, X and the id of the upstream subbasin
 #' @param i is the time step
 #' @export
-Qe_muskingum <- function(Qin,V,parm.df,i)
+Q_out_muskingum <- function(Qin,V,parm.df,i)
 {
+    dt <- parm.df@data$dt
+    K <- parm.df@data$K
+    X <- parm.df@data$X
+
     Cx <- (dt/2-K*X)/(dt/2+K*(1-X))
     Cy <- 1/(dt/2+K*(1-X))
     Qout <- Cx*Qin+Cy*V
-    return(Qe)
+    return(Qout)
 }
 
 #' Stored volume in step i. from the documentation of citydrain 2
