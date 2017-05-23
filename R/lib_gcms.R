@@ -313,11 +313,10 @@ loadPmmfs <- function(member,yeari)
     return(stObj)
 }
 
-
 #' @export
-loadTmmsfxds <- function(memberi,yeari)
+loadTechamxds <- function(memberi,yeari)
 {
-    address <- paste0("/home/delgado/SESAM/sesam_data/DFG_Erkenntnis_Transfer/Climate_Prediction/mmsf/",yeari,"/small/",memberi,"/T.",yeari,"-01-01.csv")
+    address <- paste0("/home/delgado/SESAM/sesam_data/DFG_Erkenntnis_Transfer/Climate_Prediction/xds/xds.echam/ECHAM/",memberi,"/pdd/T.",yeari,"-01-01.csv")
     X <- read.table(address,sep=",",header=TRUE,check.names=FALSE,fill=TRUE,na.strings="-9999")
     
     addressmeta <- "/home/delgado/SESAM/sesam_data/DFG_Erkenntnis_Transfer/Climate_Prediction/xds/Ceara/StationData/"
@@ -330,7 +329,97 @@ loadTmmsfxds <- function(memberi,yeari)
     
     X <- X[,order(colnames(X))]
     Vec <- as.data.frame(as.vector(t(X)))
-    colnames(Vec) <- "values"
+    colnames(Vec) <- "value"
+                                        #        mtrx <- cbind(mtrx,Vec)
+    
+    
+    XY <- data.frame(lon=Xmeta$lon[Xmeta$id %in% colnames(X)],lat=Xmeta$lat[Xmeta$id %in% colnames(X)],row.names=Xmeta$id[Xmeta$id %in% colnames(X)])
+    XY <- XY[order(rownames(XY)),]
+    ll <- SpatialPoints(XY,proj4string=CRS("+proj=longlat +ellps=WGS84 +no_defs"))
+    
+    t <- as.POSIXct(paste(T$Y,T$M,T$D,sep="-",tz="BRT")) 
+    stObj <- STFDF(sp=ll,time=t,data=Vec)
+    return(stObj)
+}
+
+
+#' @export
+loadTechameqm <- function(memberi,yeari)
+{
+    address <- paste0("~/SESAM/sesam_data/DFG_Erkenntnis_Transfer/Climate_Prediction/eqm/pred/echam/",memberi,"/T.",yeari,"-01-01.csv")
+    X <- read.table(address,sep=",",header=TRUE,check.names=FALSE,fill=TRUE,na.strings="-9999")
+    
+    addressmeta <- "/home/delgado/SESAM/sesam_data/DFG_Erkenntnis_Transfer/Climate_Prediction/xds/Ceara/StationData/"
+    
+    Xmeta <- read.table(paste0(addressmeta,"meta.txt"),sep=",",header=TRUE, check.names=FALSE,fill=TRUE,na.strings="-9999")
+    Xmeta <- Xmeta[Xmeta$var %in% "T",]
+    
+    T <- X[,1:3]
+    X <- X[,-1:-3]
+    
+    X <- X[,order(colnames(X))]
+    Vec <- as.data.frame(as.vector(t(X)))
+    colnames(Vec) <- "value"
+                                        #        mtrx <- cbind(mtrx,Vec)
+    
+    
+    XY <- data.frame(lon=Xmeta$lon[Xmeta$id %in% colnames(X)],lat=Xmeta$lat[Xmeta$id %in% colnames(X)],row.names=Xmeta$id[Xmeta$id %in% colnames(X)])
+    XY <- XY[order(rownames(XY)),]
+    ll <- SpatialPoints(XY,proj4string=CRS("+proj=longlat +ellps=WGS84 +no_defs"))
+    
+    t <- as.POSIXct(paste(T$Y,T$M,T$D,sep="-",tz="BRT")) 
+    stObj <- STFDF(sp=ll,time=t,data=Vec)
+    return(stObj)
+}
+
+
+#' @export
+loadTmmsfeqm <- function(memberi,yeari)
+{
+    address <- paste0("~/SESAM/sesam_data/DFG_Erkenntnis_Transfer/Climate_Prediction/eqm/pred/ecmwf_mmsf/",memberi,"/T.",yeari,"-01-01.csv")
+    X <- read.table(address,sep=",",header=TRUE,check.names=FALSE,fill=TRUE,na.strings="-9999")
+    
+    addressmeta <- "/home/delgado/SESAM/sesam_data/DFG_Erkenntnis_Transfer/Climate_Prediction/xds/Ceara/StationData/"
+    
+    Xmeta <- read.table(paste0(addressmeta,"meta.txt"),sep=",",header=TRUE, check.names=FALSE,fill=TRUE,na.strings="-9999")
+    Xmeta <- Xmeta[Xmeta$var %in% "T",]
+    
+    T <- X[,1:3]
+    X <- X[,-1:-3]
+    
+    X <- X[,order(colnames(X))]
+    Vec <- as.data.frame(as.vector(t(X)))
+    colnames(Vec) <- "value"
+                                        #        mtrx <- cbind(mtrx,Vec)
+    
+    
+    XY <- data.frame(lon=Xmeta$lon[Xmeta$id %in% colnames(X)],lat=Xmeta$lat[Xmeta$id %in% colnames(X)],row.names=Xmeta$id[Xmeta$id %in% colnames(X)])
+    XY <- XY[order(rownames(XY)),]
+    ll <- SpatialPoints(XY,proj4string=CRS("+proj=longlat +ellps=WGS84 +no_defs"))
+    
+    t <- as.POSIXct(paste(T$Y,T$M,T$D,sep="-",tz="BRT")) 
+    stObj <- STFDF(sp=ll,time=t,data=Vec)
+    return(stObj)
+}
+
+
+#' @export
+loadTmmsfxds <- function(memberi,yeari)
+{
+    address <- paste0("/home/delgado/SESAM/sesam_data/DFG_Erkenntnis_Transfer/Climate_Prediction/xds/xds.ecmwf/mmsf.LR.bc/",yeari,"/pdd/",memberi,"/T.",yeari,"-01-01.csv")
+    X <- read.table(address,sep=",",header=TRUE,check.names=FALSE,fill=TRUE,na.strings="-9999")
+    
+    addressmeta <- "/home/delgado/SESAM/sesam_data/DFG_Erkenntnis_Transfer/Climate_Prediction/xds/Ceara/StationData/"
+    
+    Xmeta <- read.table(paste0(addressmeta,"meta.txt"),sep=",",header=TRUE, check.names=FALSE,fill=TRUE,na.strings="-9999")
+    Xmeta <- Xmeta[Xmeta$var %in% "T",]
+    
+    T <- X[,1:3]
+    X <- X[,-1:-3]
+    
+    X <- X[,order(colnames(X))]
+    Vec <- as.data.frame(as.vector(t(X)))
+    colnames(Vec) <- "value"
                                         #        mtrx <- cbind(mtrx,Vec)
     
     
