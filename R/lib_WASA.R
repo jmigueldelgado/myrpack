@@ -562,7 +562,10 @@ read_rainfall_hourly <- function(l)
     }
 
 
-
+#' writes WASA input file T
+#' @param stObj is a spacetime object whose points are the centroids of the subbasins
+#' @param address is the path where the file should be written
+#' @export
 spacetime2WASA_T <- function(stObj,address)
 {
     df <- as(stObj,"data.frame")
@@ -589,6 +592,10 @@ spacetime2WASA_T <- function(stObj,address)
     close(fileConn)            
 }
 
+#' writes WASA input file R
+#' @param stObj is a spacetime object whose points are the centroids of the subbasins
+#' @param address is the path where the file should be written
+#' @export
 spacetime2WASA_R <- function(stObj)
 {
     df <- as(stObj,"data.frame")
@@ -614,6 +621,10 @@ spacetime2WASA_R <- function(stObj)
 }
 
 
+#' writes WASA input file H
+#' @param stObj is a spacetime object whose points are the centroids of the subbasins
+#' @param address is the path where the file should be written
+#' @export
 spacetime2WASA_H <- function(stObj,address)
 {
     df <- as(stObj,"data.frame")

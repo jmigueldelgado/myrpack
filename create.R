@@ -1,4 +1,4 @@
 library("devtools")
 require(roxygen2)
-setwd("/home/delgado/Projects/myrpack")
+setwd("/home/delgado/proj/myrpack")
 document()
