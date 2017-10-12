@@ -35,19 +35,17 @@ apply_rel <- function(spdf,xfc,xobs,model,lead,plower,pupper)
 
 
 #' function apply ROC
+#' @param pol is the polygon for which xfc and xobs will be aggregated
 #' @param xfc is a spacetime data-frame with the forecast
 #' @param xobs is a scapetime data-frame with the observation
 #' @param model is the name of the model, eg "echam+xds" or "echam+eqm" or "mmsf"
 #' @param lead is an integer with the value of the lead time of the prediction in months
 #' @export
-apply_roc <- function(spdf,xfc,xobs,model,lead,plower,pupper)
+apply_roc <- function(pol,xfc,xobs,model,lead,plower,pupper)
 {
 
-    xfc <- aggr_month_after_lead(xfc,spdf,lead)
-    xobs <- aggr_month_after_lead(xobs,spdf,lead)
-##    xfc  <- aggr_lead_plus_3months(xfc,spdf,lead)
-##    xobs <- aggr_lead_plus_3months(xobs,spdf,lead)
-
+    xfc <- aggr_month_after_lead(xfc,pol,lead)
+    xobs <- aggr_month_after_lead(xobs,pol,lead)
 
     p <- c(plower,pupper)
     thresh <- quantile(xobs,probs=p)
@@ -68,7 +66,7 @@ apply_roc <- function(spdf,xfc,xobs,model,lead,plower,pupper)
 
    # three.month.abb <- c("FMA","MAM","AMJ")
     
-    roc <- data.frame(HR=HRi,FAR=FARi,fp=fpi,binlo=xfc_bins$binlo,binhi=xfc_bins$binhi,binct=xfc_bins$binct,model=model,forecast_month=month.abb[2+lead],region=spdf@data[1,1],event_threshold=paste0("[",paste0(p,collapse="-"),"]"))
+    roc <- data.frame(HR=HRi,FAR=FARi,fp=fpi,binlo=xfc_bins$binlo,binhi=xfc_bins$binhi,binct=xfc_bins$binct,model=model,forecast_month=month.abb[2+lead],region=pol@data[1,1],event_threshold=paste0("[",paste0(p,collapse="-"),"]"))
  
     if(sum(roc$HR==0 & roc$FAR==0)>0)
     {
@@ -76,9 +74,8 @@ apply_roc <- function(spdf,xfc,xobs,model,lead,plower,pupper)
     }
     else
     {
-        return(rbind(roc,data.frame(HR=0,FAR=0,fp=NA,binlo=NA,binhi=NA,binct=NA,model=model,forecast_month=month.abb[2+lead],region=spdf@data[1,1],event_threshold=paste0("[",paste0(p,collapse="-"),"]"))))
+        return(rbind(roc,data.frame(HR=0,FAR=0,fp=NA,binlo=NA,binhi=NA,binct=NA,model=model,forecast_month=month.abb[2+lead],region=pol@data[1,1],event_threshold=paste0("[",paste0(p,collapse="-"),"]"))))
     }
-    
 } 
 
 #' aggregate forecast/observation for January+lead by polygon
