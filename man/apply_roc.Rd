@@ -4,9 +4,11 @@
 \alias{apply_roc}
 \title{function apply ROC}
 \usage{
-apply_roc(spdf, xfc, xobs, model, lead, plower, pupper)
+apply_roc(pol, xfc, xobs, model, lead, plower, pupper)
 }
 \arguments{
+\item{pol}{is the polygon for which xfc and xobs will be aggregated}
+
 \item{xfc}{is a spacetime data-frame with the forecast}
 
 \item{xobs}{is a scapetime data-frame with the observation}
