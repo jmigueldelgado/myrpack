@@ -578,6 +578,7 @@ long2WASA_P <- function(long,address)
         select(-date)
     
     dfObj2 <- select(long,-x,-y) %>%
+        mutate(value=round(value)) %>%
         spread(location,value) %>%
         select(-date)
     dfObj <- bind_cols(dfObj1,dfObj2)
@@ -638,6 +639,7 @@ long2WASA_T <- function(long,address)
         select(-date)
     
     dfObj2 <- select(long,-x,-y) %>%
+        mutate(value=round(value)) %>%
         spread(location,value) %>%
         select(-date)
     dfObj <- bind_cols(dfObj1,dfObj2)
@@ -666,6 +668,7 @@ long2WASA_R <- function(long,address)
         select(-date)
     
     dfObj2 <- select(long,-x,-y) %>%
+        mutate(value=round(value)) %>%
         spread(location,value) %>%
         select(-date)
     dfObj <- bind_cols(dfObj1,dfObj2)
@@ -723,6 +726,7 @@ long2WASA_H <- function(long,address)
         select(-date)
     
     dfObj2 <- select(long,-x,-y) %>%
+        mutate(value=round(value)) %>%
         spread(location,value) %>%
         select(-date)
     dfObj <- bind_cols(dfObj1,dfObj2)
