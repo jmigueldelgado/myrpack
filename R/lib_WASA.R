@@ -659,7 +659,7 @@ long2WASA_R <- function(long,address)
 {
     try(system(paste0("mkdir ",address)))
     try(system(paste0("rm ",address,"/radiation.dat")))
-    fileConn <- file("./radiation.dat","a")
+    fileConn <- file(paste0(address,"/radiation.dat"),"a")
     cat("Daily average radiation [W/m2]","Date\tNo. of days\tSubbasin-ID.", file = fileConn, sep = "\n")
 
     dfObj1 <- select(long,date) %>%
