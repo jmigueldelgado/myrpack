@@ -73,6 +73,8 @@ roc <- function(xfc,xobs,type="cont",prctile_upper=0.33,prctile_lower=NULL,thres
 
     if(type=="prob")
     {
+        if(class(xobs)=="numeric") xobs <- data.frame(xobs)
+        if(class(xfc)=="numeric") xfc <- data.frame(xfc)
         event_tbl <- bind_cols(xfc,xobs)
         colnames(event_tbl) <- c("forecasted","observed")
     }
