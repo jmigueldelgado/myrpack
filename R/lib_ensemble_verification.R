@@ -42,48 +42,54 @@ apply_rel <- function(spdf,xfc,xobs,model,lead,plower,pupper)
 #' @param thresh_upper is optional. In case no percentiles are given, a threshold value must be given
 #' @param thresh_lower is optional. In case no percentiles are given, a threshold value must be given 
 #' @export
-roc <- function(xfc,xobs,prctile_upper=0.33,prctile_lower=NULL,thresh_upper=NULL,thresh_lower=NULL)
+roc <- function(xfc,xobs,type="cont",prctile_upper=0.33,prctile_lower=NULL,thresh_upper=NULL,thresh_lower=NULL)
 {
-    if(is.null(thresh_upper) & is.null(thresh_lower))
+    if(type=="cont") # compute thresholds based on input parameters
+        {
+            if(is.null(thresh_upper) & is.null(thresh_lower))
+            {
+                p <- c(prctile_lower,prctile_pupper)
+                thresh <- quantile(xobs,probs=p)
+                thresh_lower <- thresh[1]
+                thresh_upper <- thresh[2]
+                if(p[1]==0) thresh_lower <- min(xobs) - 2*max(xobs) ## a low value
+                if(p[2]==1) thresh_upper <- 10*max(xobs) ## a large value
+            }
+            
+            if(!is.null(thresh_upper))
+            {
+                thresh_lower <- min(xobs) - 2*max(xobs) ## a low value
+            }
+            
+            if(!is.null(thresh_lower))
+            {
+                thresh_upper <- 10*max(xobs) ## a large value
+            }
+            
+            thresh <- c(thresh_lower,thresh_upper)
+            
+            event_tbl <- obs_fc_table(xobs,xfc,thresh)
+        }
+    if(type=="prob")
     {
-        p <- c(prctile_lower,prctile_pupper)
-        thresh <- quantile(xobs,probs=p)
-        thresh_lower <- thresh[1]
-        thresh_upper <- thresh[2]
-        if(p[1]==0) thresh_lower <- min(xobs) - 2*max(xobs) ## a low value
-        if(p[2]==1) thresh_upper <- 10*max(xobs) ## a large value
+        event_tbl <- bind_cols(xfc,xobs)
+        colnames(event_tbl) <- c("forecasted","observed")
     }
-
-    if(!is.null(thresh_upper))
-    {
-        thresh_lower <- min(xobs) - 2*max(xobs) ## a low value
-    }
-
-    if(!is.null(thresh_lower))
-    {
-        thresh_upper <- 10*max(xobs) ## a large value
-    }
-
-    thresh <- c(thresh_lower,thresh_upper)
-
-
-
-    ##### from apply_roc
-    event_tbl <- obs_fc_table(xobs,xfc,thresh)
+    
     xfc_bins <- get_fc_prob_bins(event_tbl)
-
+    
     fpi <- getfp(xfc_bins,event_tbl)
-
+    
     
     Oi <- getOi(xfc_bins,event_tbl)
     NOi <- getNOi(xfc_bins,event_tbl)
-
+    
     HRi <- getHRi_ROC(xfc_bins,Oi)
     FARi <- getFARi_ROC(xfc_bins,NOi)
-
+    
    # three.month.abb <- c("FMA","MAM","AMJ")
     
-    roc <- data.frame(HR=HRi,FAR=FARi,fp=fpi,binlo=xfc_bins$binlo,binhi=xfc_bins$binhi,binct=xfc_bins$binct,model=model,forecast_month=month.abb[2+lead],region=pol@data[1,1],event_threshold=paste0("[",paste0(p,collapse="-"),"]"))
+    roc <- data.frame(HR=HRi,FAR=FARi,fp=fpi,binlo=xfc_bins$binlo,binhi=xfc_bins$binhi,binct=xfc_bins$binct)
  
     if(sum(roc$HR==0 & roc$FAR==0)>0)
     {
@@ -91,42 +97,12 @@ roc <- function(xfc,xobs,prctile_upper=0.33,prctile_lower=NULL,thresh_upper=NULL
     }
     else
     {
-        return(rbind(roc,data.frame(HR=0,FAR=0,fp=NA,binlo=NA,binhi=NA,binct=NA,model=model,forecast_month=month.abb[2+lead],region=pol@data[1,1],event_threshold=paste0("[",paste0(p,collapse="-"),"]"))))
+        return(rbind(roc,data.frame(HR=0,FAR=0,fp=NA,binlo=NA,binhi=NA,binct=NA)
     }
 
 }
 
 
-#' function apply ROC
-#' @param obs is a binary vector
-#' @param pred is a vector of probabilities
-#' @export
-roc_prob_bin <- function(obs,pred)
-{
-
-    event_tbl <- data.frame(observed=as.numeric(obs),forecasted=as.numeric(pred))
-    xfc_bins <- get_fc_prob_bins(event_tbl)
-
-    fpi <- getfp(xfc_bins,event_tbl)
-    
-    
-    Oi <- getOi(xfc_bins,event_tbl)
-    NOi <- getNOi(xfc_bins,event_tbl)
-
-    HRi <- getHRi_ROC(xfc_bins,Oi)
-    FARi <- getFARi_ROC(xfc_bins,NOi)
-    
-    rocdf <- data.frame(HR=HRi,FAR=FARi,fp=fpi,binlo=xfc_bins$binlo,binhi=xfc_bins$binhi,binct=xfc_bins$binct)
- 
-    if(sum(rocdf$HR==0 & rocdf$FAR==0)>0)
-    {
-        return(rocdf)
-    }
-    else
-    {
-        return(rbind(rocdf,data.frame(HR=0,FAR=0,fp=NA,binlo=NA,binhi=NA,binct=NA)))
-    }
-} 
 
 #' aggregate forecast/observation for January+lead by polygon
 #' @export
