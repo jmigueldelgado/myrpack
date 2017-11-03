@@ -98,46 +98,33 @@ roc <- function(xfc,xobs,prctile_upper=0.33,prctile_lower=NULL,thresh_upper=NULL
 
 
 #' function apply ROC
-#' @param pol is the polygon for which xfc and xobs will be aggregated
-#' @param xfc is a spacetime data-frame with the forecast
-#' @param xobs is a scapetime data-frame with the observation
-#' @param model is the name of the model, eg "echam+xds" or "echam+eqm" or "mmsf"
-#' @param lead is an integer with the value of the lead time of the prediction in months
+#' @param obs is a binary vector
+#' @param pred is a vector of probabilities
 #' @export
-apply_roc <- function(pol,xfc,xobs,model,lead,plower,pupper)
+roc_prob_bin <- function(obs,pred)
 {
 
-    xfc <- aggr_month_after_lead(xfc,pol,lead)
-    xobs <- aggr_month_after_lead(xobs,pol,lead)
-
-    p <- c(plower,pupper)
-    thresh <- quantile(xobs,probs=p)
-    if(p[1]==0) thresh[1] <- 0
-    if(p[2]==1) thresh[2] <- 2*max(xobs)
-
-    event_tbl <- obs_fc_table(xobs,xfc,thresh)
+    event_tbl <- data.frame(observed=as.numeric(obs),forecasted=as.numeric(pred))
     xfc_bins <- get_fc_prob_bins(event_tbl)
 
     fpi <- getfp(xfc_bins,event_tbl)
-
+    
     
     Oi <- getOi(xfc_bins,event_tbl)
     NOi <- getNOi(xfc_bins,event_tbl)
 
     HRi <- getHRi_ROC(xfc_bins,Oi)
     FARi <- getFARi_ROC(xfc_bins,NOi)
-
-   # three.month.abb <- c("FMA","MAM","AMJ")
     
-    roc <- data.frame(HR=HRi,FAR=FARi,fp=fpi,binlo=xfc_bins$binlo,binhi=xfc_bins$binhi,binct=xfc_bins$binct,model=model,forecast_month=month.abb[2+lead],region=pol@data[1,1],event_threshold=paste0("[",paste0(p,collapse="-"),"]"))
+    rocdf <- data.frame(HR=HRi,FAR=FARi,fp=fpi,binlo=xfc_bins$binlo,binhi=xfc_bins$binhi,binct=xfc_bins$binct)
  
-    if(sum(roc$HR==0 & roc$FAR==0)>0)
+    if(sum(rocdf$HR==0 & rocdf$FAR==0)>0)
     {
-        return(roc)
+        return(rocdf)
     }
     else
     {
-        return(rbind(roc,data.frame(HR=0,FAR=0,fp=NA,binlo=NA,binhi=NA,binct=NA,model=model,forecast_month=month.abb[2+lead],region=pol@data[1,1],event_threshold=paste0("[",paste0(p,collapse="-"),"]"))))
+        return(rbind(rocdf,data.frame(HR=0,FAR=0,fp=NA,binlo=NA,binhi=NA,binct=NA)))
     }
 } 
 
