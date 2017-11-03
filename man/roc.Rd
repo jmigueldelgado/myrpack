@@ -4,7 +4,7 @@
 \alias{roc}
 \title{roc of ensemble forecast}
 \usage{
-roc(xfc, xobs, prctile_upper = 0.33, prctile_lower = NULL,
+roc(xfc, xobs, type = "cont", prctile_upper = 0.33, prctile_lower = NULL,
   thresh_upper = NULL, thresh_lower = NULL)
 }
 \arguments{

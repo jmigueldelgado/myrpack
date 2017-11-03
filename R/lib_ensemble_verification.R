@@ -45,31 +45,32 @@ apply_rel <- function(spdf,xfc,xobs,model,lead,plower,pupper)
 roc <- function(xfc,xobs,type="cont",prctile_upper=0.33,prctile_lower=NULL,thresh_upper=NULL,thresh_lower=NULL)
 {
     if(type=="cont") # compute thresholds based on input parameters
+    {
+        if(is.null(thresh_upper) & is.null(thresh_lower))
         {
-            if(is.null(thresh_upper) & is.null(thresh_lower))
-            {
-                p <- c(prctile_lower,prctile_pupper)
-                thresh <- quantile(xobs,probs=p)
-                thresh_lower <- thresh[1]
-                thresh_upper <- thresh[2]
-                if(p[1]==0) thresh_lower <- min(xobs) - 2*max(xobs) ## a low value
-                if(p[2]==1) thresh_upper <- 10*max(xobs) ## a large value
-            }
-            
-            if(!is.null(thresh_upper))
-            {
-                thresh_lower <- min(xobs) - 2*max(xobs) ## a low value
-            }
-            
-            if(!is.null(thresh_lower))
-            {
-                thresh_upper <- 10*max(xobs) ## a large value
-            }
-            
-            thresh <- c(thresh_lower,thresh_upper)
-            
-            event_tbl <- obs_fc_table(xobs,xfc,thresh)
+            p <- c(prctile_lower,prctile_pupper)
+            thresh <- quantile(xobs,probs=p)
+            thresh_lower <- thresh[1]
+            thresh_upper <- thresh[2]
+            if(p[1]==0) thresh_lower <- min(xobs) - 2*max(xobs) ## a low value
+            if(p[2]==1) thresh_upper <- 10*max(xobs) ## a large value
         }
+        
+        if(!is.null(thresh_upper))
+        {
+            thresh_lower <- min(xobs) - 2*max(xobs) ## a low value
+        }
+        
+        if(!is.null(thresh_lower))
+        {
+            thresh_upper <- 10*max(xobs) ## a large value
+        }
+        
+        thresh <- c(thresh_lower,thresh_upper)
+        
+        event_tbl <- obs_fc_table(xobs,xfc,thresh)
+    }
+
     if(type=="prob")
     {
         event_tbl <- bind_cols(xfc,xobs)
@@ -97,7 +98,7 @@ roc <- function(xfc,xobs,type="cont",prctile_upper=0.33,prctile_lower=NULL,thres
     }
     else
     {
-        return(rbind(roc,data.frame(HR=0,FAR=0,fp=NA,binlo=NA,binhi=NA,binct=NA)
+        return(rbind(roc,data.frame(HR=0,FAR=0,fp=NA,binlo=NA,binhi=NA,binct=NA)))
     }
 
 }
