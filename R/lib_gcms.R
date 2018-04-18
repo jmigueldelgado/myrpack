@@ -1005,3 +1005,57 @@ loadPechameqm <- function(memberi,yeari)
     return(stObj)
 }
 
+#' @export
+rsm2long_P <- function(memberi,yeari)
+{
+
+    memberi <- 
+    #"~/SESAM/sesam_data/DFG_Erkenntnis_Transfer/Climate_Prediction/echamrsm/pcp-daily-rsm97-hind8110-1981-2015/"
+
+    address <- paste0("/home/delgado/SESAM/sesam_data/DFG_Erkenntnis_Transfer/Climate_Prediction/echamrsm/pcp-daily-rsm97-hind8110-1981-2015/pcp.daily.rsm97.hind8110.jan",yeari,".",yeari,"01-",yeari,"08.nc")
+#    addressmeta <- "/home/delgado/SESAM/sesam_data/DFG_Erkenntnis_Transfer/Climate_Prediction/xds/Ceara/StationData/"
+    nc <- open.nc(con=address,write=FALSE)
+
+#    print.nc(nc)
+    lat <- var.get.nc(nc,variable="lat")
+    lon <- var.get.nc(nc,variable="lon")
+    time <- var.get.nc(nc,variable="time")
+    ntime <- length(time)
+#    ensemble <- var.get.nc(nc,variable="ensemble")
+    t0 <- att.get.nc(nc,variable="time",attribute="units")
+    t0 <- paste(strsplit(t0,split=" ")[[1]][3],strsplit(t0,split=" ")[[1]][4])    
+    t0 <- as.POSIXct(t0,tz="BRT")
+    var <- "pcp"
+    tt <- t0+days(time)    
+
+
+    #var.inq.nc(nc,"lat")
+    xloc <- var.get.nc(nc,variable=var,c(1,1,1,1),c(length(lon),length(lat),1,1)) #### ensemble member and time switched places,,,
+
+
+    dimnames(xloc)[[1]] <- as.character(lon)
+    dimnames(xloc)[[2]] <- as.character(lat)
+    xloc <- melt(xloc)
+    colnames(xloc) <- c("lon","lat","values")
+    
+    coo <- coordinates(cbind(xloc[,1],xloc[,2]))
+    SP <- SpatialPoints(coords=coo, proj4string=CRS("+proj=longlat +ellps=WGS84 +no_defs"))
+                                        #    SPix <- SpatialPixels(SP)
+    
+    x <- var.get.nc(nc,variable=var,c(1,1,1,memberi),c(length(lon),length(lat),length(time),1)) #### ensemble member and time switched places,,,
+    
+    
+    dimnames(x)[[1]] <- as.character(lon)
+    dimnames(x)[[2]] <- as.character(lat)
+                                        #       dimnames(x)[[3]] <- as.character(members)
+    dimnames(x)[[3]] <- as.character(time)
+    xmelt <- melt(x,id.vars=c("lon","lat"))
+    colnames(xmelt) <- c("lon","lat","time","value")
+        
+    xx <- xmelt[with(xmelt,order(time,-lat,lon)),]
+
+    close.nc(nc)
+
+    return(xx)
+
+}
